@@ -1,0 +1,28 @@
+{
+  "presets": [
+    "es2015",
+    "stage-0"
+  ],
+  "plugins": [
+    "transform-decorators-legacy",
+    "transform-class-properties",
+    "transform-es2015-modules-amd",
+    "transform-runtime"
+  ],
+  "sourceMaps": "inline",
+  "env": {
+    "lib": {
+      "presets": [
+        [
+          "latest"
+        ]
+      ],
+      "plugins": [
+        "transform-decorators-legacy",
+        "transform-class-properties",
+        "transform-es2015-modules-amd",
+        "transform-runtime"
+      ]
+    }
+  }
+}
