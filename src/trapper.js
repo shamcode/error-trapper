@@ -140,7 +140,7 @@ function parseScope( ast, stackLine ) {
     function findScopeForNode( node ) {
         let parent = node;
         while (
-            'FunctionExpression' !== parent.type &&
+            'FunctionDeclaration' !== parent.type &&
             'FunctionExpression' !== parent.type &&
             'Program' !== node.type
         ) {
