@@ -1,4 +1,6 @@
 import Promise from 'promise-polyfill';
+import { parse } from 'esprima';
+import { walkAddParent } from 'esprima-walk';
 
 export default function errorTrap( fn ) {
     return function() {
@@ -20,16 +22,14 @@ export function parseError( e ) {
         return firstFile
             .loadFileContent()
             .then( ( response ) => {
-
-                // TODO: use esprima for collect context
-                const line = response.split( '\n' )[ firstFile.line - 1 ];
-                const chunk = line.slice( 0, firstFile.column - 1 );
-                const accessorChain = chunk.split( '.' );
-                if ( accessorChain.length > 1 ) {
-                    const elems = accessorChain[ 0 ].split( ' ' );
-                    const last = elems[ elems.length - 1 ];
-                    return `(function() { return { ${last}: ${last} } })()`;
-                }
+                const ast = parse( response, {
+                    loc: true,
+                    comment: true
+                } );
+                const scopeVariables = parseScope( ast, firstFile );
+                const scopeMapping = scopeVariables.map( variable => `'${variable}': ${variable}` );
+                const scopeContext = `{${scopeMapping.join( ',' )} }`;
+                return `(function(){return${scopeContext}})()`;
             } )
         ;
     }
@@ -116,23 +116,77 @@ class StackLine {
                 this.fileContent = response.text();
                 return this.fileContent;
             } )
-        ;
+            ;
     }
 }
 
+/**
+ * @param {Object} ast
+ * @param {StackLine} stackLine
+ */
+function parseScope( ast, stackLine ) {
+
+    function findNodeByLine( ast, line ) {
+        let searchableNode = null;
+        // TODO: stop after find
+        walkAddParent( ast, ( node ) => {
+            if ( node.loc.start.line === line ) {
+                searchableNode = node;
+            }
+        } );
+        return searchableNode;
+    }
+
+    function findScopeForNode( node ) {
+        let parent = node;
+        while (
+            'FunctionExpression' !== parent.type &&
+            'FunctionExpression' !== parent.type &&
+            'Program' !== node.type
+        ) {
+            parent = parent.parent;
+        }
+        return parent;
+    }
+
+    function isEqualNode( a, b ) {
+        return a.loc.start.line === b.loc.start.line &&
+            a.loc.start.column === b.loc.start.column &&
+            a.loc.end.line === b.loc.end.line &&
+            a.loc.end.column === b.loc.end.column
+        ;
+    }
+
+    function collectVariableDeclarators( scopeNode ) {
+        const nodes = [];
+        walkAddParent( scopeNode, ( node ) => {
+            if ( 'VariableDeclarator' === node.type &&
+                isEqualNode( scopeNode, findScopeForNode( node ) )
+            ) {
+                nodes.push( node );
+            }
+        } );
+        return nodes;
+    }
+
+    const node = findNodeByLine( ast, stackLine.line );
+    const scopeNode = findScopeForNode( node );
+    const variableDeclarations = collectVariableDeclarators( scopeNode );
+    return variableDeclarations.map( node => node.id.name );
+}
 
 /*
-try {
-    const foo = { firstName: 'Andy' };
-    const bar = controller.lastName.toString;
-} catch ( e ) {
+ try {
+ const foo = { firstName: 'Andy' };
+ const bar = controller.lastName.toString;
+ } catch ( e ) {
 
-    // TODO: move to babel macro: https://github.com/codemix/babel-plugin-macros
-    parseError( e ).then( ( code ) => {
-        const context = eval( code );
-        console.error( e );
-        printContext( context );
-    } );
-    throw e;
-}
+ // TODO: move to babel macro: https://github.com/codemix/babel-plugin-macros
+ parseError( e ).then( ( code ) => {
+ const context = eval( code );
+ console.error( e );
+ printContext( context );
+ } );
+ throw e;
+ }
  */

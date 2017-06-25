@@ -1,4 +1,5 @@
 var fs = require( 'fs' );
+var LiveReloadPlugin = require('webpack-livereload-plugin');
 
 var libraryName = 'trapper';
 var plugins = [];
@@ -48,7 +49,9 @@ var testConfig = {
     resolve: {
         extensions: [ '.js' ]
     },
-    plugins: plugins
+    plugins: [
+        new LiveReloadPlugin()
+    ]
 };
 
 module.exports = [ libraryConfig, testConfig ];

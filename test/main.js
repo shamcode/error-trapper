@@ -20,7 +20,10 @@ window.onload = () => {
                     const context = eval( code );
                     console.error( e );
                     printContext( context );
+                    const keys = Object.keys( context );
+                    expect( keys.length ).to.be.equal( 2 );
                     expect( context.foo ).to.be.equal( foo );
+                    expect( context.bar ).to.be.undefined;
                     done();
                 } );
                 // throw e;
