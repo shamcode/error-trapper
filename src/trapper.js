@@ -1,6 +1,7 @@
 import Promise from 'promise-polyfill';
 import { parse } from 'esprima';
 import { walkAddParent } from 'esprima-walk';
+import { analyze as scopeAnalyze } from 'escope';
 
 export default function errorTrap( fn ) {
     return function() {
@@ -149,30 +150,23 @@ function parseScope( ast, stackLine ) {
         return parent;
     }
 
-    function isEqualNode( a, b ) {
-        return a.loc.start.line === b.loc.start.line &&
-            a.loc.start.column === b.loc.start.column &&
-            a.loc.end.line === b.loc.end.line &&
-            a.loc.end.column === b.loc.end.column
+    function collectVariableNames( ast, scopeNode ) {
+        const scopeManager = scopeAnalyze( ast );
+        const currentScope = scopeManager.acquire( scopeNode );
+        return currentScope
+            .variables
+            .map( variable => variable.name )
+            .concat(
+                ...currentScope.references.map( reference => reference.identifier.name )
+            )
+            .filter( variable => -1 ===  [ 'arguments' ].indexOf( variable ) )
         ;
-    }
-
-    function collectVariableDeclarators( scopeNode ) {
-        const nodes = [];
-        walkAddParent( scopeNode, ( node ) => {
-            if ( 'VariableDeclarator' === node.type &&
-                isEqualNode( scopeNode, findScopeForNode( node ) )
-            ) {
-                nodes.push( node );
-            }
-        } );
-        return nodes;
     }
 
     const node = findNodeByLine( ast, stackLine.line );
     const scopeNode = findScopeForNode( node );
-    const variableDeclarations = collectVariableDeclarators( scopeNode );
-    return variableDeclarations.map( node => node.id.name );
+
+    return collectVariableNames( ast, scopeNode );
 }
 
 /*
