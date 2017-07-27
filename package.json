@@ -25,6 +25,7 @@
     "babel-register": "^6.18.0",
     "chai": "^3.5.0",
     "http-server": "^0.10.0",
+    "json-stringify-safe": "^5.0.1",
     "mocha": "^3.4.1",
     "mocha-phantomjs-core": "^2.1.1",
     "phantomjs": "^2.1.7",

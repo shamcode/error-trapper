@@ -1,4 +1,4 @@
-import { parseError, printContext } from '../src/trapper';
+import { parseError, printContext, normalizeForStringify } from '../src/trapper';
 
 window.onload = () => {
     mocha.ui( 'bdd' );
@@ -22,7 +22,7 @@ window.onload = () => {
                     printContext( context );
                     const keys = Object.keys( context );
                     expect( keys.length ).to.be.equal( 3 );
-                    expect( context.foo ).to.be.equal( foo );
+                    expect( context.foo ).to.be.deep.equal( foo );
                     expect( context.bar ).to.be.undefined;
                     expect( context.done.toString() ).to.be.equal( done.toString() );
                     done();
@@ -45,14 +45,36 @@ window.onload = () => {
                         printContext( context );
                         const keys = Object.keys( context );
                         expect( keys.length ).to.be.equal( 2 );
-                        expect( context.foo ).to.be.equal( foo );
+                        expect( context.foo ).to.be.deep.equal( foo );
                         expect( context.bar ).to.be.undefined;
                         done();
                     } );
                     // throw e;
                 }
             })();
-        } )
+        } );
+
+        it( 'Use normalizeForStringify with circular reference', ( done ) => {
+            const foo = { firstName: 'Andy' };
+            foo.self = foo;
+            try {
+                const bar = foo.lastName.toString;
+            } catch ( e ) {
+                parseError( e ).then( ( code ) => {
+                    const context = normalizeForStringify( eval( code ) );
+                    console.error( e );
+                    printContext( context );
+                    const keys = Object.keys( context );
+                    expect( keys.length ).to.be.equal( 3 );
+                    expect( context.foo ).to.be.deep.equal( {
+                        firstName: 'Andy',
+                        self: '[Circular ~]'
+                    } );
+                    expect( context.bar ).to.be.undefined;
+                    done();
+                } )
+            }
+        } );
     } );
 
     mocha.run();

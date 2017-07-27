@@ -1,4 +1,5 @@
 import Promise from 'promise-polyfill';
+import stringify from 'json-stringify-safe';
 import { parse } from 'esprima';
 import { walkAddParent } from 'esprima-walk';
 import { analyze as scopeAnalyze } from 'escope';
@@ -38,8 +39,6 @@ export function parseError( e ) {
 }
 
 export function normalizeForStringify( context ) {
-
-    // TODO: use https://github.com/isaacs/json-stringify-safe
     const normalizedContext = {};
     Object
         .keys( context )
@@ -55,15 +54,7 @@ function normalizeVariableForStringify( variableValue ) {
         JSON.stringify( variableValue );
         return variableValue;
     } catch ( e ) {
-        const res = {};
-        Object
-            .keys( variableValue )
-            .forEach( key => {
-                const value = variableValue[ key ];
-                res[ key ] = value !== undefined && value !== null ? value.toString() : value;
-            } )
-        ;
-        return res;
+        return JSON.parse( stringify( variableValue ) );
     }
 }
 
@@ -117,7 +108,7 @@ class StackLine {
                 this.fileContent = response.text();
                 return this.fileContent;
             } )
-            ;
+        ;
     }
 }
 
