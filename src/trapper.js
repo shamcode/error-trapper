@@ -4,16 +4,11 @@ import { parse } from 'esprima';
 import { walkAddParent } from 'esprima-walk';
 import { analyze as scopeAnalyze } from 'escope';
 
-export default function errorTrap( fn ) {
-    return function() {
-        try {
-            return fn.apply( this, arguments );
-        } catch ( e ) {
-            parseError( e );
-            throw e;
-        }
-    };
-}
+window.ErrorTrapper = {
+    parseError,
+    normalizeForStringify,
+    printContext
+};
 
 export function parseError( e ) {
     const regex = /Cannot read property '(.+)' of undefined/i;
@@ -117,6 +112,10 @@ class StackLine {
  * @param {StackLine} stackLine
  */
 function parseScope( ast, stackLine ) {
+    const IGNORE_VARIABLES = [
+        'arguments',
+        '___SCOPE_HOISING___'
+    ];
 
     function findNodeByLine( ast, line ) {
         let searchableNode = null;
@@ -150,7 +149,7 @@ function parseScope( ast, stackLine ) {
             .concat(
                 ...currentScope.references.map( reference => reference.identifier.name )
             )
-            .filter( variable => -1 ===  [ 'arguments' ].indexOf( variable ) )
+            .filter( variable => -1 === IGNORE_VARIABLES.indexOf( variable ) )
         ;
     }
 
@@ -159,19 +158,3 @@ function parseScope( ast, stackLine ) {
 
     return collectVariableNames( ast, scopeNode );
 }
-
-/*
- try {
- const foo = { firstName: 'Andy' };
- const bar = controller.lastName.toString;
- } catch ( e ) {
-
- // TODO: move to babel macro: https://github.com/codemix/babel-plugin-macros
- parseError( e ).then( ( code ) => {
- const context = eval( code );
- console.error( e );
- printContext( context );
- } );
- throw e;
- }
- */

@@ -6,7 +6,8 @@
   "plugins": [
     "transform-decorators-legacy",
     "transform-class-properties",
-    "transform-es2015-modules-amd"
+    "transform-es2015-modules-amd",
+    "babel-macros"
   ],
   "sourceMaps": "inline",
   "env": {
@@ -20,7 +21,8 @@
         "transform-decorators-legacy",
         "transform-class-properties",
         "transform-es2015-modules-amd",
-        "transform-runtime"
+        "transform-runtime",
+        "babel-macros"
       ]
     }
   }

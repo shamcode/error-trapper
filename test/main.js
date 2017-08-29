@@ -1,4 +1,5 @@
 import { parseError, printContext, normalizeForStringify } from '../src/trapper';
+import ERROR_TRAP from '../src/trap.macro';
 
 window.onload = () => {
     mocha.ui( 'bdd' );
@@ -61,6 +62,7 @@ window.onload = () => {
                 const bar = foo.lastName.toString;
             } catch ( e ) {
                 parseError( e ).then( ( code ) => {
+
                     const context = normalizeForStringify( eval( code ) );
                     console.error( e );
                     printContext( context );
@@ -75,6 +77,22 @@ window.onload = () => {
                 } )
             }
         } );
+    } );
+
+    describe( 'Macro', () => {
+        it( 'Use ERROR_TRAP macro', ( done ) => {
+            ERROR_TRAP( () => {
+                const foo = { firstName: 'Andy' };
+                const bar = foo.lastName.toString;
+            }, () => {
+                printContext( context );
+                const keys = Object.keys( context );
+                expect( keys.length ).to.be.equal( 2 );
+                expect( context.foo.firstName ).to.be.deep.equal( 'Andy' );
+                expect( context.bar ).to.be.undefined;
+                done();
+            } )();
+        } )
     } );
 
     mocha.run();
