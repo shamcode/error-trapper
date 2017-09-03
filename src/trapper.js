@@ -1,160 +1,39 @@
-import Promise from 'promise-polyfill';
-import stringify from 'json-stringify-safe';
+// todo: dynamic load esprima
 import { parse } from 'esprima';
-import { walkAddParent } from 'esprima-walk';
-import { analyze as scopeAnalyze } from 'escope';
 
+import extractErrorPlace from './parsers/stack';
+import parseScope from './parsers/scope';
+import normalizeForStringify from './normalizers/for-stringify';
+import printContext from './utils/print-context';
+
+// TODO: use  defineProperty
 window.ErrorTrapper = {
     parseError,
     normalizeForStringify,
     printContext
 };
 
-export function parseError( e ) {
-    const regex = /Cannot read property '(.+)' of undefined/i;
-    if ( e instanceof TypeError && regex.test( e.message ) ) {
-        const key = e.message.match( regex )[ 1 ];
-        const stackLines = parseStack( e.stack );
-        const firstFile = stackLines[ 0 ];
-        return firstFile
-            .loadFileContent()
-            .then( ( response ) => {
-                const ast = parse( response, {
-                    loc: true,
-                    comment: true
-                } );
-                const scopeVariables = parseScope( ast, firstFile );
-                const scopeMapping = scopeVariables.map( variable => `'${variable}': ${variable}` );
-                const scopeContext = `{${scopeMapping.join( ',' )} }`;
-                return `(function(){return${scopeContext}})()`;
-            } )
-        ;
+export default function parseError( e, callback ) {
+    const firstFile = extractErrorPlace( e.stack );
+    if ( firstFile === null ) {
+        return callback( { success: false, code: null } );
     }
-    return Promise.resolve( '' );
-}
-
-export function normalizeForStringify( context ) {
-    const normalizedContext = {};
-    Object
-        .keys( context )
-        .forEach( variable => {
-            normalizedContext[ variable ] = normalizeVariableForStringify( context[ variable ] );
-        } )
-    ;
-    return normalizedContext;
-}
-
-function normalizeVariableForStringify( variableValue ) {
-    try {
-        JSON.stringify( variableValue );
-        return variableValue;
-    } catch ( e ) {
-        return JSON.parse( stringify( variableValue ) );
-    }
-}
-
-export function printContext( context ) {
-    console.group( 'Runtime context' );
-    const normalizedContext = normalizeForStringify( context );
-    for ( let variable in normalizedContext ) {
-        if ( !normalizedContext.hasOwnProperty( variable ) ) {
-            continue;
-        }
-        console.group( variable );
-        console.dir( normalizedContext[ variable ] );
-        console.groupEnd();
-    }
-    console.groupEnd();
-}
-
-function parseStack( stackMessage ) {
-    const withFunctionRegex = /at (.+) \((.+):(\d+):(\d+)\)/i;
-    const withoutFunctionRegex = /at (.+):(\d+):(\d+)/i;
-    return stackMessage
-        .split( '\n' )
-        .slice( 1 ) // Passing error message
-        .map( rawLine => {
-            const trimmedLine = rawLine.trim();
-            let matches = trimmedLine.match( withFunctionRegex );
-            if ( null === matches ) {
-                const [ file, line, column ] = trimmedLine
-                    .match( withoutFunctionRegex )
-                    .slice( 1 )
-                ;
-                return new StackLine( file, line, column );
-            }
-            const [ method, file, line, column ] = matches.slice( 1 );
-            return new StackLine( file, line, column, method );
+    return firstFile
+        .loadFileContent( ( response ) => {
+            const ast = parse( response, {
+                loc: true,
+                comment: true
+            } );
+            const scopeVariables = parseScope( ast, firstFile );
+            const scopeMapping = scopeVariables.map( variable => `'${variable}': ${variable}` );
+            const scopeContext = `{${scopeMapping.join( ',' )} }`;
+            callback( {
+                success: true,
+                code: `(function(){return${scopeContext}})()`
+            } );
+        }, () => {
+            callback( { success: false, code: null } );
         } )
     ;
 }
 
-class StackLine {
-    constructor( file, line, column, method ) {
-        this.file = file;
-        this.line = parseInt( line );
-        this.column = parseInt( column );
-        this.method = method;
-    }
-
-    loadFileContent() {
-        return fetch( this.file )
-            .then( ( response ) => {
-                this.fileContent = response.text();
-                return this.fileContent;
-            } )
-        ;
-    }
-}
-
-/**
- * @param {Object} ast
- * @param {StackLine} stackLine
- */
-function parseScope( ast, stackLine ) {
-    const IGNORE_VARIABLES = [
-        'arguments',
-        '___SCOPE_HOISING___'
-    ];
-
-    function findNodeByLine( ast, line ) {
-        let searchableNode = null;
-        // TODO: stop after find
-        walkAddParent( ast, ( node ) => {
-            if ( node.loc.start.line === line ) {
-                searchableNode = node;
-            }
-        } );
-        return searchableNode;
-    }
-
-    function findScopeForNode( node ) {
-        let parent = node;
-        while (
-            'FunctionDeclaration' !== parent.type &&
-            'FunctionExpression' !== parent.type &&
-            'Program' !== node.type
-        ) {
-            parent = parent.parent;
-        }
-        return parent;
-    }
-
-    function collectVariableNames( ast, scopeNode ) {
-        const scopeManager = scopeAnalyze( ast );
-        const currentScope = scopeManager.acquire( scopeNode );
-        return currentScope
-            .variables
-            .map( variable => variable.name )
-            .concat(
-                ...currentScope.references.map( reference => reference.identifier.name )
-            )
-            .filter( variable => -1 === IGNORE_VARIABLES.indexOf( variable ) )
-        ;
-    }
-
-    const node = findNodeByLine( ast, stackLine.line );
-    const scopeNode = findScopeForNode( node );
-
-    return collectVariableNames( ast, scopeNode );
-}

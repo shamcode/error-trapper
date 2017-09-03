@@ -1,5 +1,7 @@
-import { parseError, printContext, normalizeForStringify } from '../src/trapper';
-import ERROR_TRAP from '../src/trap.macro';
+import parseError from '../src/trapper';
+import printContext from '../src/utils/print-context';
+import normalizeForStringify from '../src/normalizers/for-stringify';
+import ERROR_TRAP from '../src/macros/trap.macro';
 
 window.onload = () => {
     mocha.ui( 'bdd' );
@@ -16,10 +18,8 @@ window.onload = () => {
             try {
                 const bar = foo.lastName.toString;
             } catch ( e ) {
-
-                parseError( e ).then( ( code ) => {
+                parseError( e, ( { code } ) => {
                     const context = eval( code );
-                    console.error( e );
                     printContext( context );
                     const keys = Object.keys( context );
                     expect( keys.length ).to.be.equal( 3 );
@@ -40,9 +40,8 @@ window.onload = () => {
                     bar = foo.lastName.toString;
                 } catch ( e ) {
 
-                    parseError( e ).then( ( code ) => {
+                    parseError( e, ( { code } ) => {
                         const context = eval( code );
-                        console.error( e );
                         printContext( context );
                         const keys = Object.keys( context );
                         expect( keys.length ).to.be.equal( 2 );
@@ -61,10 +60,8 @@ window.onload = () => {
             try {
                 const bar = foo.lastName.toString;
             } catch ( e ) {
-                parseError( e ).then( ( code ) => {
-
+                parseError( e, ( { code } ) => {
                     const context = normalizeForStringify( eval( code ) );
-                    console.error( e );
                     printContext( context );
                     const keys = Object.keys( context );
                     expect( keys.length ).to.be.equal( 3 );
@@ -84,9 +81,10 @@ window.onload = () => {
             ERROR_TRAP( () => {
                 const foo = { firstName: 'Andy' };
                 const bar = foo.lastName.toString;
-            }, () => {
+            }, ( e, context ) => {
                 printContext( context );
                 const keys = Object.keys( context );
+                expect( e instanceof TypeError).to.be.true;
                 expect( keys.length ).to.be.equal( 2 );
                 expect( context.foo.firstName ).to.be.deep.equal( 'Andy' );
                 expect( context.bar ).to.be.undefined;
@@ -95,5 +93,8 @@ window.onload = () => {
         } )
     } );
 
+    if ( window.initMochaPhantomJS ) {
+        window.initMochaPhantomJS()
+    }
     mocha.run();
 };
