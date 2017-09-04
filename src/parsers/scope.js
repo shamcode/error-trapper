@@ -39,14 +39,16 @@ export default function parseScope( ast, stackLine ) {
     function collectVariableNames( ast, scopeNode ) {
         const scopeManager = scopeAnalyze( ast );
         const currentScope = scopeManager.acquire( scopeNode );
-        return currentScope
+        const variables = currentScope
             .variables
-            .map( variable => variable.name )
-            .concat(
-                ...currentScope.references.map( reference => reference.identifier.name )
-            )
-            .filter( variable => -1 === IGNORE_VARIABLES.indexOf( variable ) )
-        ;
+            .map( variable => variable.name );
+        currentScope.references.forEach( reference => {
+            const variableName = reference.identifier.name;
+            if ( -1 === variables.indexOf( variableName ) ) {
+                variables.push( variableName );
+            }
+        } );
+        return variables.filter( variable => -1 === IGNORE_VARIABLES.indexOf( variable ) );
     }
 
     const node = findNodeByLine( ast, stackLine.line );

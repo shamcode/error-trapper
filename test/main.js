@@ -19,6 +19,9 @@ window.onload = () => {
                 const bar = foo.lastName.toString;
             } catch ( e ) {
                 parseError( e, ( { code } ) => {
+                    expect( code ).to.be.equal(
+                        '(function(){return{\'done\':done,\'foo\':foo,\'bar\':bar}})()'
+                    );
                     const context = eval( code );
                     printContext( context );
                     const keys = Object.keys( context );
@@ -39,8 +42,10 @@ window.onload = () => {
                 try {
                     bar = foo.lastName.toString;
                 } catch ( e ) {
-
                     parseError( e, ( { code } ) => {
+                        expect( code ).to.be.equal(
+                            '(function(){return{\'bar\':bar,\'foo\':foo}})()'
+                        );
                         const context = eval( code );
                         printContext( context );
                         const keys = Object.keys( context );
@@ -61,6 +66,9 @@ window.onload = () => {
                 const bar = foo.lastName.toString;
             } catch ( e ) {
                 parseError( e, ( { code } ) => {
+                    expect( code ).to.be.equal(
+                        '(function(){return{\'done\':done,\'foo\':foo,\'bar\':bar}})()'
+                    );
                     const context = normalizeForStringify( eval( code ) );
                     printContext( context );
                     const keys = Object.keys( context );
@@ -93,8 +101,5 @@ window.onload = () => {
         } )
     } );
 
-    if ( window.initMochaPhantomJS ) {
-        window.initMochaPhantomJS()
-    }
     mocha.run();
 };

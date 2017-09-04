@@ -10,7 +10,8 @@
     "watch": "WEBPACK_ENV=dev webpack --progress --colors --watch",
     "build": "WEBPACK_ENV=build webpack",
     "dev": "WEBPACK_ENV=dev webpack --progress --colors",
-    "test": "./node_modules/phantomjs/bin/phantomjs ./node_modules/mocha-phantomjs-core/mocha-phantomjs-core.js test/index.html"
+    "pretest": "npm run dev",
+    "test": "node ./node_modules/testem/testem.js ci"
   },
   "devDependencies": {
     "babel-cli": "^6.23.0",
@@ -31,6 +32,7 @@
     "mocha": "^3.4.1",
     "mocha-phantomjs-core": "^2.1.1",
     "phantomjs": "^2.1.7",
+    "testem": "^1.18.4",
     "webpack": "^2.2.1"
   },
   "dependencies": {

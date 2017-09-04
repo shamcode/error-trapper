@@ -25,8 +25,8 @@ export default function parseError( e, callback ) {
                 comment: true
             } );
             const scopeVariables = parseScope( ast, firstFile );
-            const scopeMapping = scopeVariables.map( variable => `'${variable}': ${variable}` );
-            const scopeContext = `{${scopeMapping.join( ',' )} }`;
+            const scopeMapping = scopeVariables.map( variable => `'${variable}':${variable}` );
+            const scopeContext = `{${scopeMapping.join( ',' )}}`;
             callback( {
                 success: true,
                 code: `(function(){return${scopeContext}})()`
