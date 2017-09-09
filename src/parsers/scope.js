@@ -17,6 +17,35 @@ function isNumber( value ) {
 }
 
 /**
+ * @param {Object} node
+ * @param {Number} line
+ * @param {Number|*} column
+ */
+function isNodeOnPosition( node, line, column ) {
+    const start = node.loc.start;
+    return start.line === line && (
+        !isNumber( column ) ||
+        !isNumber( start.column ) ||
+        start.column === column
+    )
+}
+
+/**
+ * @param {Object} node
+ * @param {Number} line
+ * @param {Number|*} column
+ */
+function nodeSiblingAfter( node, line, column ) {
+    const start = node.loc.start;
+    return start.line > line || (
+        start.line === line &&
+        isNumber( start.column ) &&
+        isNumber( column )  &&
+        start.column > column
+    );
+}
+
+/**
  * Find node by passing line number
  * @param {Object} ast
  * @param {Number} line
@@ -29,20 +58,16 @@ function findNodeByLineAndAddParent( ast, line, column ) {
     for ( let i = 0; i < stack.length; i++ ) {
         const node = stack[ i ];
         const start = node.loc.start;
-        if ( start.line === line ) {
-            if ( !( isNumber( column ) && isNumber( start.column ) ) ) {
-                return node;
-            }
-            if ( start.column < column ) {
-                lastWalkedNodeAtLine = node;
-            } else if ( start.column > column ) {
-                return lastWalkedNodeAtLine;
-            } else {
-                return node;
-            }
-        } else if ( start.line > line && null !== lastWalkedNodeAtLine ) {
+        if ( isNodeOnPosition( node, line, column ) ) {
+            return node;
+        }
+        if ( null !== lastWalkedNodeAtLine && nodeSiblingAfter( node, line, column ) ) {
             return lastWalkedNodeAtLine;
         }
+        if ( start.line === line && start.column < column ) {
+            lastWalkedNodeAtLine = node;
+        }
+
         for ( let key in node ) {
             if ( node.hasOwnProperty( key ) && key !== 'parent' ) {
                 const child = node[ key ];
