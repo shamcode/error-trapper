@@ -8,3 +8,4 @@ Thumbs.db
 /test/*/assets/bundle.js
 /test/*/assets/bundle.js.map
 /lib/
+index.js
