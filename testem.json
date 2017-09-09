@@ -1,6 +1,7 @@
 {
   "framework": "mocha",
   "test_page": [
+    "./test/initialize/index.html",
     "./test/parse-error/index.html",
     "./test/macro/index.html"
   ],

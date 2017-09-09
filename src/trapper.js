@@ -36,12 +36,38 @@ export default function parseError( e, callback ) {
     ;
 }
 
+function ErrorTrapper() {
+    Object.defineProperties( this, {
+        parseError: {
+            value: parseError,
+            writable: false,
+            enumerable: false,
+            configurable: false
+        },
+        normalizeForStringify: {
+            value: normalizeForStringify,
+            writable: false,
+            enumerable: false,
+            configurable: false
+        },
+        printContext: {
+            value: printContext,
+            writable: false,
+            enumerable: false,
+            configurable: false
+        }
+    } );
+    Object.preventExtensions( this );
+}
+
 export function initialize( esprimaBundleUrl ) {
     ESPRIMA_BUNDLE_URL = esprimaBundleUrl;
-    // TODO: use  defineProperty
-    window.ErrorTrapper = {
-        parseError,
-        normalizeForStringify,
-        printContext
-    };
+    if ( !window.ErrorTrapper ) {
+        Object.defineProperty( window, 'ErrorTrapper', {
+            value: new ErrorTrapper,
+            writable: false,
+            enumerable: false,
+            configurable: false
+        } );
+    }
 }
