@@ -81,6 +81,26 @@ window.onload = () => {
                 } )
             }
         } );
+
+        it( 'Parse column (emulate minimized code)', ( done ) => {
+            const foo = { firstName: 'Andy' }; foo.self = foo; try { const bar = foo.lastName.toString; bar(); } catch ( e ) {
+                parseError( e, ( { code } ) => {
+                    expect( code ).to.be.equal(
+                        '(function(){return{\'done\':done,\'foo\':foo,\'bar\':bar}})()'
+                    );
+                    const context = normalizeForStringify( eval( code ) );
+                    printContext( context );
+                    const keys = Object.keys( context );
+                    expect( keys.length ).to.be.equal( 3 );
+                    expect( context.foo ).to.be.deep.equal( {
+                        firstName: 'Andy',
+                        self: '[Circular ~]'
+                    } );
+                    expect( context.bar ).to.be.undefined;
+                    done();
+                } )
+            }
+        } );
     } );
 
     mocha.run();

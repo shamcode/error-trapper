@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "escope": "^3.6.0",
-    "esprima": "^4.0.0",
-    "esprima-walk": "^0.1.0"
+    "esprima": "^4.0.0"
   }
 }
