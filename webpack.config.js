@@ -14,8 +14,8 @@ const libraryConfig = {
     entry: `${__dirname}/src/error-trapper.js`,
     devtool: 'source-map',
     output: {
-        path: __dirname + '/lib',
-        filename: `${libraryName}.js`,
+        path: __dirname,
+        filename: 'index.js',
         library: libraryName,
         libraryTarget: 'umd',
         umdNamedDefine: true
