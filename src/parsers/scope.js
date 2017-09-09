@@ -1,11 +1,12 @@
 import { walkAddParent } from 'esprima-walk';
 import { analyze as scopeAnalyze } from 'escope';
+import { SCOPE_CLOSURE_VARIABLE } from './constants';
 
 // TODO: dynamic load escope
 
 const IGNORE_VARIABLES = [
     'arguments',
-    '___SCOPE_CLOSURE_VARIABLE___'
+    SCOPE_CLOSURE_VARIABLE
 ];
 
 /**

@@ -1,5 +1,6 @@
 const babylon = require( 'babylon' );
 const generate = require( 'babel-generator' ).default;
+const SCOPE_CLOSURE_VARIABLE = require( '../parsers/constants' ).SCOPE_CLOSURE_VARIABLE;
 
 module.exports = errorTrapMacro;
 
@@ -18,7 +19,7 @@ function thingToAST( body, callback ) {
     return babylon.parse( `
     (function() {
         return function() {
-            var ___SCOPE_CLOSURE_VARIABLE___;
+            var ${SCOPE_CLOSURE_VARIABLE};
             try 
                 ${generate( body ).code}
             catch(e) {
@@ -28,7 +29,7 @@ function thingToAST( body, callback ) {
                     ErrorTrapper.parseError(localError, function(parsedError) {
                         if (parsedError.success) {
                             var context = ErrorTrapper.normalizeForStringify(eval(parsedError.code));
-                            (${generate( callback ).code})(e, context, ___SCOPE_CLOSURE_VARIABLE___)
+                            (${generate( callback ).code})(e, context, ${SCOPE_CLOSURE_VARIABLE})
                         } else {
                             (${generate( callback ).code})(e, {})
                         }

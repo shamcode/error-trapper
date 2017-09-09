@@ -1,15 +1,15 @@
-var fs = require( 'fs' );
-var LiveReloadPlugin = require('webpack-livereload-plugin');
+const fs = require( 'fs' );
 
-var libraryName = 'trapper';
-var plugins = [];
+const libraryName = 'trapper';
+const plugins = [];
 
-var libraryConfig = {
-    entry: [ 'whatwg-fetch', __dirname + '/src/trapper.js' ],
+const libraryConfig = {
+    plugins,
+    entry: `${__dirname}/src/trapper.js`,
     devtool: 'source-map',
     output: {
         path: __dirname + '/lib',
-        filename: libraryName + '.js',
+        filename: `${libraryName}.js`,
         library: libraryName,
         libraryTarget: 'umd',
         umdNamedDefine: true
@@ -25,33 +25,40 @@ var libraryConfig = {
     },
     resolve: {
         extensions: [ '.js' ]
-    },
-    plugins: plugins
+    }
 };
 
-var testConfig = {
-    entry: [ 'whatwg-fetch', __dirname + '/test/main.js' ],
-    devtool: 'source-map',
-    output: {
-    path:  __dirname + '/test/assets',
-        filename: 'bundle.js',
-        umdNamedDefine: true
-},
-    module: {
-        loaders: [
-            {
-                test: /(\.js)$/,
-                loader: 'babel-loader',
-                exclude: /(node_modules|bower_components)/
-            }
-        ]
-    },
-    resolve: {
-        extensions: [ '.js' ]
-    },
-    plugins: [
-        new LiveReloadPlugin()
-    ]
-};
+function buildTestName( testName ) {
+    return {
+        plugins,
+        entry: {
+            [ testName ]: `${__dirname}/test/${testName}/main.js`
+        },
+        devtool: 'source-map',
+        output: {
+            path: `${__dirname}/test/${testName}/assets`,
+            filename: 'bundle.js',
+            umdNamedDefine: true
+        },
+        module: {
+            loaders: [
+                {
+                    test: /(\.js)$/,
+                    loader: 'babel-loader',
+                    exclude: /(node_modules|bower_components)/
+                }
+            ]
+        },
+        resolve: {
+            extensions: [ '.js' ]
+        }
+    }
+}
 
-module.exports = [ libraryConfig, testConfig ];
+var exports = [ libraryConfig ];
+const files = fs.readdirSync( './test' );
+files.forEach( ( testDirectory ) => {
+    exports.push( buildTestName( testDirectory ) )
+} );
+
+module.exports = exports;

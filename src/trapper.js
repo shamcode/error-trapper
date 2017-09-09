@@ -6,12 +6,8 @@ import parseScope from './parsers/scope';
 import normalizeForStringify from './normalizers/for-stringify';
 import printContext from './utils/print-context';
 
-// TODO: use  defineProperty
-window.ErrorTrapper = {
-    parseError,
-    normalizeForStringify,
-    printContext
-};
+// Auto initialize on import
+initialize();
 
 export default function parseError( e, callback ) {
     const firstFile = extractErrorPlace( e.stack );
@@ -37,3 +33,11 @@ export default function parseError( e, callback ) {
     ;
 }
 
+export function initialize() {
+    // TODO: use  defineProperty
+    window.ErrorTrapper = {
+        parseError,
+        normalizeForStringify,
+        printContext
+    };
+}

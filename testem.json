@@ -1,6 +1,9 @@
 {
   "framework": "mocha",
-  "test_page": "./test/index.html",
+  "test_page": [
+    "./test/parse-error/index.html",
+    "./test/macro/index.html"
+  ],
   "launch_in_dev": [
     "Chrome",
     "PhantomJS",

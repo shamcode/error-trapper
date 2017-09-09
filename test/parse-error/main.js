@@ -1,7 +1,6 @@
-import parseError from '../src/trapper';
-import printContext from '../src/utils/print-context';
-import normalizeForStringify from '../src/normalizers/for-stringify';
-import ERROR_TRAP from '../src/macros/trap.macro';
+import parseError from '../../src/trapper';
+import printContext from '../../src/utils/print-context';
+import normalizeForStringify from '../../src/normalizers/for-stringify';
 
 window.onload = () => {
     mocha.ui( 'bdd' );
@@ -12,7 +11,7 @@ window.onload = () => {
 
     const expect = chai.expect;
 
-    describe( 'Trapper', () => {
+    describe( 'Parse error', () => {
         it( 'TypeError', ( done ) => {
             const foo = { firstName: 'Andy' };
             try {
@@ -82,23 +81,6 @@ window.onload = () => {
                 } )
             }
         } );
-    } );
-
-    describe( 'Macro', () => {
-        it( 'Use ERROR_TRAP macro', ( done ) => {
-            ERROR_TRAP( () => {
-                const foo = { firstName: 'Andy' };
-                const bar = foo.lastName.toString;
-            }, ( e, context ) => {
-                printContext( context );
-                const keys = Object.keys( context );
-                expect( e instanceof TypeError).to.be.true;
-                expect( keys.length ).to.be.equal( 2 );
-                expect( context.foo.firstName ).to.be.deep.equal( 'Andy' );
-                expect( context.bar ).to.be.undefined;
-                done();
-            } )();
-        } )
     } );
 
     mocha.run();
