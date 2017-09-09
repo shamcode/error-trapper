@@ -2,7 +2,7 @@
   "name": "error-trapper",
   "version": "0.0.1",
   "main": "index.js",
-  "repository": "https://github.com/shamcode/trapper",
+  "repository": "https://github.com/shamcode/error-trapper",
   "license": "MIT",
   "scripts": {
     "build": "WEBPACK_ENV=build webpack",
