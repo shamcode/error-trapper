@@ -134,6 +134,7 @@ function collectVariableNames( ast, scopeNode, scopeAnalyze ) {
  * @param {Object} ast
  * @param {StackLine} stackLine
  * @param {Function} scopeAnalyze
+ * @return {Array.<String>}
  */
 export default function parseScope( ast, stackLine, scopeAnalyze ) {
     const node = findNodeByLineAndAddParent( ast, stackLine.line, stackLine.column );
