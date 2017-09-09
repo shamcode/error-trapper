@@ -1,11 +1,17 @@
 const fs = require( 'fs' );
+const webpack = require( 'webpack' );
 
-const libraryName = 'trapper';
 const plugins = [];
+const env = process.env.WEBPACK_ENV;
+if (  env === 'build' ) {
+    plugins.push( new webpack.optimize.UglifyJsPlugin( { minimize: true } ) );
+}
+
+const libraryName = 'error-trapper';
 
 const libraryConfig = {
     plugins,
-    entry: `${__dirname}/src/trapper.js`,
+    entry: `${__dirname}/src/error-trapper.js`,
     devtool: 'source-map',
     output: {
         path: __dirname + '/lib',
@@ -81,9 +87,12 @@ function buildTestName( testName ) {
 }
 
 var exports = [ libraryConfig, esprimaPrebuildConfig ];
-const files = fs.readdirSync( './test' );
-files.forEach( ( testDirectory ) => {
-    exports.push( buildTestName( testDirectory ) )
-} );
+
+if ( env !== 'build' ) {
+    const files = fs.readdirSync( './test' );
+    files.forEach( ( testDirectory ) => {
+        exports.push( buildTestName( testDirectory ) )
+    } );
+}
 
 module.exports = exports;

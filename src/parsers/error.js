@@ -1,7 +1,7 @@
 import loadEsprimaBundle from '../loader/esprima-bundle';
 import extractErrorPlace from './stack';
 import parseScope from './scope';
-import { SETTINGS } from '../trapper';
+import { SETTINGS } from '../error-trapper';
 
 /**
  * Parse error scope

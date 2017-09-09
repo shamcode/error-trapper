@@ -1,4 +1,4 @@
-import { SCOPE_CLOSURE_VARIABLE } from './constants';
+import { SCOPE_CLOSURE_VARIABLE } from '../../macros/constants';
 
 // TODO: dynamic load escope
 

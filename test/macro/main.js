@@ -1,5 +1,5 @@
-import initialize from '../../src/trapper';
-import ERROR_TRAP from '../../src/macros/trap.macro';
+import initialize  from '../../';
+import ERROR_TRAP from '../../macros/trap.macro';
 
 initialize( `${window.location.hash}../../lib/esprima-bundle.js` );
 

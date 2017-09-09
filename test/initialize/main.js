@@ -1,4 +1,4 @@
-import initialize from '../../src/trapper';
+import initialize from '../../';
 
 window.onload = () => {
     mocha.ui( 'bdd' );

@@ -1,3 +1,6 @@
 /src/
 .idea
 /test/
+testem.json
+webpack.config.js
+.babelrc

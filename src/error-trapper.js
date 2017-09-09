@@ -31,7 +31,7 @@ function ErrorTrapper() {
 }
 
 /**
- * Initialize trapper
+ * Initialize error trapper
  * @param {String} esprimaBundleUrl url for esprima-bundle
  */
 export default function initialize( esprimaBundleUrl ) {

@@ -1,4 +1,4 @@
-import initialize from '../../src/trapper';
+import initialize from '../../src/error-trapper';
 import parseError from '../../src/parsers/error';
 import printContext from '../../src/utils/print-context';
 import normalizeForStringify from '../../src/normalizers/for-stringify';
