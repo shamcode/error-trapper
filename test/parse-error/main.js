@@ -1,6 +1,8 @@
-import parseError from '../../src/trapper';
+import parseError, { initialize } from '../../src/trapper';
 import printContext from '../../src/utils/print-context';
 import normalizeForStringify from '../../src/normalizers/for-stringify';
+
+initialize( `${window.location.hash}../../lib/esprima-bundle.js` );
 
 window.onload = () => {
     mocha.ui( 'bdd' );

@@ -1,3 +1,5 @@
+import loader from '../loader';
+
 /**
  * Parsed stack line
  *
@@ -19,18 +21,7 @@ class StackLine {
      * @param {Function} failback
      */
     loadFileContent( callback, failback ) {
-        const request = new XMLHttpRequest();
-        request.onreadystatechange = () => {
-            if ( XMLHttpRequest.DONE === request.readyState ) {
-                if ( 200 === request.status ) {
-                    callback( request.responseText );
-                } else {
-                    failback( request );
-                }
-            }
-        };
-        request.open( 'GET', this.file, true );
-        request.send();
+        loader.load( this.file, callback, failback );
     }
 }
 

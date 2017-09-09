@@ -28,6 +28,31 @@ const libraryConfig = {
     }
 };
 
+const esprimaPrebuildConfig = {
+    plugins,
+    entry: `${__dirname}/src/prebuilds/esprima.js`,
+    devtool: 'source-map',
+    output: {
+        path: __dirname + '/lib',
+        filename: 'esprima-bundle.js',
+        library: 'esprima-bundle',
+        libraryTarget: 'umd',
+        umdNamedDefine: true
+    },
+    module: {
+        loaders: [
+            {
+                test: /(\.js)$/,
+                loader: 'babel-loader',
+                exclude: /(node_modules|bower_components)/
+            }
+        ]
+    },
+    resolve: {
+        extensions: [ '.js' ]
+    }
+};
+
 function buildTestName( testName ) {
     return {
         plugins,
@@ -55,7 +80,7 @@ function buildTestName( testName ) {
     }
 }
 
-var exports = [ libraryConfig ];
+var exports = [ libraryConfig, esprimaPrebuildConfig ];
 const files = fs.readdirSync( './test' );
 files.forEach( ( testDirectory ) => {
     exports.push( buildTestName( testDirectory ) )

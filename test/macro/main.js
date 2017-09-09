@@ -1,7 +1,7 @@
 import { initialize } from '../../src/trapper';
 import ERROR_TRAP from '../../src/macros/trap.macro';
 
-initialize();
+initialize( `${window.location.hash}../../lib/esprima-bundle.js` );
 
 window.onload = () => {
     mocha.ui( 'bdd' );

@@ -1,4 +1,3 @@
-import { analyze as scopeAnalyze } from 'escope';
 import { SCOPE_CLOSURE_VARIABLE } from './constants';
 
 // TODO: dynamic load escope
@@ -100,10 +99,10 @@ function findNodeByLineAndAddParent( ast, line, column ) {
 function findScopeForNode( node ) {
     let parent = node;
     while (
-    'FunctionDeclaration' !== parent.type &&
-    'FunctionExpression' !== parent.type &&
-    'Program' !== node.type
-        ) {
+        'FunctionDeclaration' !== parent.type &&
+        'FunctionExpression' !== parent.type &&
+        'Program' !== node.type
+    ) {
         parent = parent.parent;
     }
     return parent;
@@ -113,9 +112,10 @@ function findScopeForNode( node ) {
  * Collect all variable names for scope
  * @param {Object} ast
  * @param {Object} scopeNode
+ * @param {Function} scopeAnalyze analyze function from 'escope'
  * @return {Array.<String>}
  */
-function collectVariableNames( ast, scopeNode ) {
+function collectVariableNames( ast, scopeNode, scopeAnalyze ) {
     const scopeManager = scopeAnalyze( ast );
     const currentScope = scopeManager.acquire( scopeNode );
     const variables = currentScope
@@ -133,12 +133,13 @@ function collectVariableNames( ast, scopeNode ) {
 /**
  * @param {Object} ast
  * @param {StackLine} stackLine
+ * @param {Function} scopeAnalyze
  */
-export default function parseScope( ast, stackLine ) {
+export default function parseScope( ast, stackLine, scopeAnalyze ) {
     const node = findNodeByLineAndAddParent( ast, stackLine.line, stackLine.column );
     if ( null === node ) {
         return [];
     }
     const scopeNode = findScopeForNode( node );
-    return collectVariableNames( ast, scopeNode );
+    return collectVariableNames( ast, scopeNode, scopeAnalyze );
 }
