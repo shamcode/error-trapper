@@ -1,4 +1,4 @@
-# Trapper
+# Error Trapper
 
 ### Install
 Install from npm:
