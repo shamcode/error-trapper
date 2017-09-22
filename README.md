@@ -1,4 +1,5 @@
 # Error Trapper
+[![Build Status](https://travis-ci.org/shamcode/error-trapper.svg?branch=master)](https://travis-ci.org/shamcode/error-trapper)
 
 ### Install
 Install from npm:
