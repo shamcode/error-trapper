@@ -1,6 +1,6 @@
 {
   "name": "error-trapper",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "main": "index.js",
   "repository": "https://github.com/shamcode/error-trapper",
   "license": "MIT",
@@ -23,18 +23,18 @@
     "babel-preset-stage-0": "^6.16.0",
     "babel-register": "^6.18.0",
     "babylon": "^6.18.0",
-    "chai": "^3.5.0",
+    "chai": "^4.1.2",
+    "escope": "^3.6.0",
+    "esprima": "^4.0.0",
     "json-stringify-safe": "^5.0.1",
     "mocha": "^3.4.1",
     "mocha-phantomjs-core": "^2.1.1",
     "phantomjs": "^2.1.7",
     "testem": "^1.18.4",
-    "webpack": "^2.2.1",
-    "escope": "^3.6.0",
-    "esprima": "^4.0.0"
+    "webpack": "^3.6.0"
   },
   "dependencies": {
     "babel-generator": "^6.26.0",
-    "babel-macros": "^0.5.2"
+    "babel-macros": "^1.0.2"
   }
 }

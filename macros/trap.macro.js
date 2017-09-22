@@ -1,8 +1,9 @@
+const { createMacro } = require( 'babel-macros' );
 const babylon = require( 'babylon' );
 const generate = require( 'babel-generator' ).default;
-const SCOPE_CLOSURE_VARIABLE = require( './constants' ).SCOPE_CLOSURE_VARIABLE;
+const { SCOPE_CLOSURE_VARIABLE } = require( './constants' );
 
-module.exports = errorTrapMacro;
+module.exports = createMacro( errorTrapMacro );
 
 function errorTrapMacro( { references } ) {
     references.default.forEach( referencePath => {
