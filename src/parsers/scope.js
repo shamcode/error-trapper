@@ -1,7 +1,5 @@
 import { SCOPE_CLOSURE_VARIABLE } from '../../macros/constants';
 
-// TODO: dynamic load escope
-
 const IGNORE_VARIABLES = [
     'arguments',
     SCOPE_CLOSURE_VARIABLE
@@ -13,6 +11,16 @@ const IGNORE_VARIABLES = [
  */
 function isNumber( value ) {
     return typeof value === 'number';
+}
+
+/**
+ * @param obj
+ * @return {Boolean}
+ */
+function isNode( obj ) {
+    return obj !== undefined &&
+        obj !== null &&
+        typeof obj.type === 'string';
 }
 
 /**
@@ -45,6 +53,32 @@ function nodeSiblingAfter( node, line, column ) {
 }
 
 /**
+ * Add "parent" to node
+ * @param {Object} node
+ * @return {Array<Object>} array of processed nodes
+ */
+function addParent( node ) {
+    const nodes = [];
+    for ( let key in node ) {
+        if ( !node.hasOwnProperty( key ) || 'parent' === key ) {
+            continue;
+        }
+        const child = node[ key ];
+        if ( child instanceof Array ) {
+            for ( let j = 0, len = child.length; j < len; j++ ) {
+                const subChild = child[ j ];
+                subChild.parent = node;
+                nodes.push( subChild )
+            }
+        } else if ( isNode( child ) ) {
+            child.parent = node;
+            nodes.push( child )
+        }
+    }
+    return nodes;
+}
+
+/**
  * Find node by passing line number
  * @param {Object} ast
  * @param {Number} line
@@ -66,27 +100,7 @@ function findNodeByLineAndAddParent( ast, line, column ) {
         if ( start.line === line && start.column < column ) {
             lastWalkedNodeAtLine = node;
         }
-
-        for ( let key in node ) {
-            if ( node.hasOwnProperty( key ) && key !== 'parent' ) {
-                const child = node[ key ];
-                if ( child instanceof Array ) {
-                    for ( let j = 0, len = child.length; j < len; j++ ) {
-                        const subChild = child[ j ];
-                        subChild.parent = node;
-                        stack.push( subChild )
-                    }
-                } else if (
-                    child !== undefined &&
-                    child !== null &&
-                    typeof child.type === 'string'
-                ) {
-                    child.parent = node;
-                    stack.push( child )
-                }
-
-            }
-        }
+        stack.push( ...addParent( node ) );
     }
     return null;
 }
