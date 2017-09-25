@@ -1,6 +1,8 @@
 /src/
 .idea
 /test/
+/screens/
 testem.json
 webpack.config.js
 .babelrc
+.travis.yml
