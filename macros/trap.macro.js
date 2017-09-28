@@ -12,14 +12,17 @@ function errorTrapMacro( { references } ) {
 }
 
 function asFunction( argumentsPaths ) {
-    const body = argumentsPaths[ 0 ].node.body;
-    argumentsPaths[ 0 ].parentPath.replaceWith( thingToAST( body, argumentsPaths[ 1 ].node ) )
+    const { params, body } = argumentsPaths[ 0 ].node;
+    argumentsPaths[ 0 ].parentPath.replaceWith( thingToAST( params, body, argumentsPaths[ 1 ].node ) )
 }
 
-function thingToAST( body, callback ) {
+function thingToAST( params, body, callback ) {
+    const paramsCode = params
+        .map( param => generate( param ).code )
+        .join( ',' );
     return babylon.parse( `
     (function() {
-        return function() {
+        return function( ${paramsCode} ) {
             var ${SCOPE_CLOSURE_VARIABLE};
             try 
                 ${generate( body ).code}

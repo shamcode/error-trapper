@@ -3,6 +3,10 @@ import ERROR_TRAP from '../../macros/trap.macro';
 
 initialize( `${window.location.hash}../../lib/esprima-bundle.js` );
 
+function trimCode( code ) {
+    return code.replace( /\s/g, '' )
+}
+
 window.onload = () => {
     mocha.ui( 'bdd' );
     mocha.reporter( 'html' );
@@ -28,11 +32,6 @@ window.onload = () => {
         } );
 
         it( 'Check generated code', ( done ) => {
-
-            function trimCode( code ) {
-                return code.replace( /\s/g, '' )
-            }
-
             const code = ERROR_TRAP(
                 () => { var foo = 42; return foo; },
                 ( e, context ) => { /* process error */}
@@ -96,6 +95,50 @@ window.onload = () => {
             }
             const obj = new MyClass;
             obj.baz();
+        } );
+
+
+        it( 'Check generated code for wrapped function', ( done ) => {
+            const code = ERROR_TRAP(
+                ( value ) => { var foo = 42; return foo; },
+                ( e, context ) => { /* process error */}
+            );
+
+            expect( trimCode( code.toString() ) ).to.be.equal( trimCode( `
+            function( value ) {
+                var ___SCOPE_CLOSURE_VARIABLE___;
+                try {
+                    var foo = 42; return foo;
+                } catch (e) {
+                    try {
+                        throw new Error();
+                    } catch (localError) {
+                        ErrorTrapper.parseError(localError, function (parsedError) {
+                            if (parsedError.success) {
+                                var context = ErrorTrapper.normalizeForStringify(eval(parsedError.code));
+                                (function (e, context) { /* process error */ })(e, context, ___SCOPE_CLOSURE_VARIABLE___);
+                            } else {
+                                (function (e, context) { /* process error */ })(e, {});
+                            }
+                        });
+                    }
+                }
+            }` ) );
+            done();
+        } );
+
+        it( 'Wrap function', function( done ) {
+            const func1 = ERROR_TRAP( function( value ) {
+                return this.settings.baseNumber * value;
+            }, ( e, context ) => {
+                const keys = Object.keys( context );
+                expect( e instanceof TypeError).to.be.true;
+                expect( keys.length ).to.be.equal( 1 );
+                expect( context.value ).to.be.undefined;
+                done();
+            } );
+
+            func1();
         } );
     } );
 
