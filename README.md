@@ -12,20 +12,19 @@ Install from npm:
 And add `babel-macros` plugin to your babel config. 
 
 ### Usage
-
+For wrap function:
 ```js
 import initialize from 'error-trapper';
-import ERROR_TRAP from 'error-trapper/macros/trap.macro';
+import WRAP from 'error-trapper/macros/wrap-function.macro';
 
 initialize( `${window.location.hash}../node_modules/error-trapper/lib/esprima-bundle.js` );
 
-ERROR_TRAP( () => {
+WRAP( () => {
     const foo = { firstName: 'Andy' };
     const bar = foo.lastName.toString;
-}, ( e, context ) => {
-    console.dir( context );
+}, ( e, scope ) => {
+    console.dir( scope );
 } )();
-
 ```
 
 Console output:
@@ -35,3 +34,21 @@ Console output:
 Or print with `ErrorTrap.printContext`:
 
 ![Console output](https://github.com/shamcode/error-trapper/blob/master/screens/print-context.png?raw=true)
+
+For parse scope:
+```js
+import initialize from 'error-trapper';
+import PARSE_SCOPE from 'error-trapper/macros/parse-scope.macro';
+
+initialize( `${window.location.hash}../node_modules/error-trapper/lib/esprima-bundle.js` );
+
+try {
+    const foo = { firstName: 'Andy' };
+    const bar = foo.lastName.toString;
+} catch (e) {
+    PARSE_SCOPE( ( scope ) => {
+        console.dir( scope );
+    } );
+}
+```
+
