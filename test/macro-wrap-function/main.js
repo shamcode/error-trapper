@@ -1,5 +1,5 @@
 import initialize  from '../../';
-import ERROR_TRAP from '../../macros/trap.macro';
+import WRAP from '../../macros/wrap-function.macro';
 
 initialize( `${window.location.hash}../../lib/esprima-bundle.js` );
 
@@ -16,9 +16,9 @@ window.onload = () => {
 
     const expect = chai.expect;
 
-    describe( 'Macro', () => {
-        it( 'Use ERROR_TRAP macro', ( done ) => {
-            ERROR_TRAP( () => {
+    describe( 'WRAP macro', () => {
+        it( 'Use macro', ( done ) => {
+            WRAP( () => {
                 const foo = { firstName: 'Andy' };
                 const bar = foo.lastName.toString;
             }, ( e, context ) => {
@@ -32,7 +32,7 @@ window.onload = () => {
         } );
 
         it( 'Check generated code', ( done ) => {
-            const code = ERROR_TRAP(
+            const code = WRAP(
                 () => { var foo = 42; return foo; },
                 ( e, context ) => { /* process error */}
             );
@@ -47,12 +47,8 @@ window.onload = () => {
                         throw new Error();
                     } catch (localError) {
                         ErrorTrapper.parseError(localError, function (parsedError) {
-                            if (parsedError.success) {
-                                var context = ErrorTrapper.normalizeForStringify(eval(parsedError.code));
-                                (function (e, context) { /* process error */ })(e, context, ___SCOPE_CLOSURE_VARIABLE___);
-                            } else {
-                                (function (e, context) { /* process error */ })(e, {});
-                            }
+                           var context = parsedError.success ? ErrorTrapper.normalizeForStringify(eval(parsedError.code)) : {};
+                           (function (e, context) {/* process error */})(e, context, ___SCOPE_CLOSURE_VARIABLE___);
                         });
                     }
                 }
@@ -62,7 +58,7 @@ window.onload = () => {
 
         it( 'Use macro with Object', function( done ) {
             const obj = {
-                baz: ERROR_TRAP( () => {
+                baz: WRAP( () => {
                     const foo2 = { firstName: 'Andy' };
                     const bar = foo2.lastName.toString;
                 }, ( e, context ) => {
@@ -80,7 +76,7 @@ window.onload = () => {
         it( 'Wrap class method', function( done ) {
             class MyClass {
                 baz() {
-                    ERROR_TRAP( () => {
+                    WRAP( () => {
                         const foo3 = { firstName: 'Andy' };
                         const bar = foo3.lastName.toString;
                     }, ( e, context ) => {
@@ -99,7 +95,7 @@ window.onload = () => {
 
 
         it( 'Check generated code for wrapped function', ( done ) => {
-            const code = ERROR_TRAP(
+            const code = WRAP(
                 ( value ) => { var foo = 42; return foo; },
                 ( e, context ) => { /* process error */}
             );
@@ -114,12 +110,8 @@ window.onload = () => {
                         throw new Error();
                     } catch (localError) {
                         ErrorTrapper.parseError(localError, function (parsedError) {
-                            if (parsedError.success) {
-                                var context = ErrorTrapper.normalizeForStringify(eval(parsedError.code));
-                                (function (e, context) { /* process error */ })(e, context, ___SCOPE_CLOSURE_VARIABLE___);
-                            } else {
-                                (function (e, context) { /* process error */ })(e, {});
-                            }
+                           var context = parsedError.success ? ErrorTrapper.normalizeForStringify(eval(parsedError.code)) : {};
+                           (function (e, context) {/* process error */})(e, context, ___SCOPE_CLOSURE_VARIABLE___);
                         });
                     }
                 }
@@ -128,7 +120,7 @@ window.onload = () => {
         } );
 
         it( 'Wrap function', function( done ) {
-            const func1 = ERROR_TRAP( function( value ) {
+            const func1 = WRAP( function( value ) {
                 return this.settings.baseNumber * value;
             }, ( e, context ) => {
                 const keys = Object.keys( context );

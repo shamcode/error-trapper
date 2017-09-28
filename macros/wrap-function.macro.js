@@ -3,9 +3,9 @@ const babylon = require( 'babylon' );
 const generate = require( 'babel-generator' ).default;
 const { SCOPE_CLOSURE_VARIABLE } = require( './constants' );
 
-module.exports = createMacro( errorTrapMacro );
+module.exports = createMacro( wrapFunctionMacro );
 
-function errorTrapMacro( { references } ) {
+function wrapFunctionMacro( { references } ) {
     references.default.forEach( referencePath => {
         asFunction( referencePath.parentPath.get( 'arguments' ) )
     } );
@@ -31,12 +31,8 @@ function thingToAST( params, body, callback ) {
                     throw new Error();   
                 } catch(localError) {
                     ErrorTrapper.parseError(localError, function(parsedError) {
-                        if (parsedError.success) {
-                            var context = ErrorTrapper.normalizeForStringify(eval(parsedError.code));
-                            (${generate( callback ).code})(e, context, ${SCOPE_CLOSURE_VARIABLE})
-                        } else {
-                            (${generate( callback ).code})(e, {})
-                        }
+                        var context = parsedError.success ? ErrorTrapper.normalizeForStringify(eval(parsedError.code)): {};
+                        (${generate( callback ).code})(e, context, ${SCOPE_CLOSURE_VARIABLE})
                     });
                 }
             }

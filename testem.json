@@ -3,7 +3,8 @@
   "test_page": [
     "./test/initialize/index.html",
     "./test/parse-error/index.html",
-    "./test/macro/index.html"
+    "./test/macro-wrap-function/index.html",
+    "./test/macro-parse-scope/index.html"
   ],
   "launch_in_dev": [
     "Chrome",
