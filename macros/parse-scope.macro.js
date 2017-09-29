@@ -23,7 +23,11 @@ function thingToAST( callback ) {
             throw new Error();   
         } catch(localError) {
             ErrorTrapper.parseError(localError, function(parsedError) {
-                var scope = parsedError.success ? ErrorTrapper.normalizeForStringify(eval(parsedError.code)) : {};
+                var scope = {};
+                if (parsedError.success) {
+                    scope = ErrorTrapper.normalizeForStringify(eval(parsedError.code));
+                    delete scope['Error']; 
+                }
                 (${generate( callback ).code})(scope, ${SCOPE_CLOSURE_VARIABLE})
             });
         }

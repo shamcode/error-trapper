@@ -59,7 +59,9 @@ function parseCode( code, stackLine, { parse, scopeAnalyze } ) {
         comment: true
     } );
     const scopeVariables = parseScope( ast, stackLine, scopeAnalyze );
-    const scopeMapping = scopeVariables.map( variable => `'${variable}':${variable}` );
-    const scopeContext = `{${scopeMapping.join( ',' )}}`;
-    return `(function(){return${scopeContext}})()`
+    const variableResolving = scopeVariables
+        .map( variable => `(function(){try{__scope['${variable}']=${variable}}catch(e){}})();` )
+        .join( '' )
+    ;
+    return `(function(){var __scope={};${variableResolving}return __scope;})()`;
 }

@@ -22,7 +22,7 @@ window.onload = () => {
             } catch ( e ) {
                 parseError( e, ( { code } ) => {
                     expect( code ).to.be.equal(
-                        '(function(){return{\'done\':done,\'foo\':foo,\'bar\':bar}})()'
+                        '(function(){var __scope={};(function(){try{__scope[\'done\']=done}catch(e){}})();(function(){try{__scope[\'foo\']=foo}catch(e){}})();(function(){try{__scope[\'bar\']=bar}catch(e){}})();return __scope;})()'
                     );
                     const context = eval( code );
                     printContext( context );
@@ -33,7 +33,6 @@ window.onload = () => {
                     expect( context.done.toString() ).to.be.equal( done.toString() );
                     done();
                 } );
-                // throw e;
             }
         } );
 
@@ -46,7 +45,7 @@ window.onload = () => {
                 } catch ( e ) {
                     parseError( e, ( { code } ) => {
                         expect( code ).to.be.equal(
-                            '(function(){return{\'bar\':bar,\'foo\':foo}})()'
+                            '(function(){var __scope={};(function(){try{__scope[\'bar\']=bar}catch(e){}})();(function(){try{__scope[\'foo\']=foo}catch(e){}})();return __scope;})()'
                         );
                         const context = eval( code );
                         printContext( context );
@@ -69,7 +68,7 @@ window.onload = () => {
             } catch ( e ) {
                 parseError( e, ( { code } ) => {
                     expect( code ).to.be.equal(
-                        '(function(){return{\'done\':done,\'foo\':foo,\'bar\':bar}})()'
+                        '(function(){var __scope={};(function(){try{__scope[\'done\']=done}catch(e){}})();(function(){try{__scope[\'foo\']=foo}catch(e){}})();(function(){try{__scope[\'bar\']=bar}catch(e){}})();return __scope;})()'
                     );
                     const context = normalizeForStringify( eval( code ) );
                     printContext( context );
@@ -89,7 +88,7 @@ window.onload = () => {
             const foo = { firstName: 'Andy' }; foo.self = foo; try { const bar = foo.lastName.toString; bar(); } catch ( e ) {
                 parseError( e, ( { code } ) => {
                     expect( code ).to.be.equal(
-                        '(function(){return{\'done\':done,\'foo\':foo,\'bar\':bar}})()'
+                        '(function(){var __scope={};(function(){try{__scope[\'done\']=done}catch(e){}})();(function(){try{__scope[\'foo\']=foo}catch(e){}})();(function(){try{__scope[\'bar\']=bar}catch(e){}})();return __scope;})()'
                     );
                     const context = normalizeForStringify( eval( code ) );
                     printContext( context );

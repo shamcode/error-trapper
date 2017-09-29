@@ -52,13 +52,27 @@ window.onload = () => {
                             throw new Error();
                         } catch (localError) {
                             ErrorTrapper.parseError(localError, function (parsedError) {
-                                var scope = parsedError.success ? ErrorTrapper.normalizeForStringify(eval(parsedError.code)) : {};
+                                var scope = {};
+                                if (parsedError.success) {
+                                    scope = ErrorTrapper.normalizeForStringify(eval(parsedError.code));
+                                    delete scope['Error']; 
+                                }
                                 (function (scope) {})(scope, ___SCOPE_CLOSURE_VARIABLE___);
                             });
                         }
                     }
             }` ) );
             done();
+        } );
+
+        it( 'Use without try/catch', ( done ) => {
+            const foo = { firstName: 'Andy' };
+            PARSE_SCOPE( ( scope ) => {
+                const keys = Object.keys( scope ).sort();
+                expect( keys ).to.be.deep.equal(  [ 'done', 'foo' ] );
+                expect( scope.foo.firstName ).to.be.equal( 'Andy' );
+                done();
+            } );
         } );
     } );
 

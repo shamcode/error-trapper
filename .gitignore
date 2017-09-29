@@ -9,3 +9,4 @@ Thumbs.db
 /test/*/assets/bundle.js.map
 /lib/
 index.js
+index.js.map
