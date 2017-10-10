@@ -1,7 +1,13 @@
 {
   "name": "error-trapper",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "main": "index.js",
+  "keywords": [
+    "babel-macros",
+    "errors",
+    "debug"
+  ],
+  "author": "sham",
   "repository": "https://github.com/shamcode/error-trapper",
   "license": "MIT",
   "scripts": {
@@ -36,5 +42,8 @@
   "dependencies": {
     "babel-generator": "^6.26.0",
     "babel-macros": "^1.0.2"
+  },
+  "engines": {
+    "node": ">= 7.*"
   }
 }
