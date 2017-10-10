@@ -13,13 +13,22 @@ function wrapFunctionMacro( { references } ) {
 
 function asFunction( argumentsPaths ) {
     const { params, body } = argumentsPaths[ 0 ].node;
-    argumentsPaths[ 0 ].parentPath.replaceWith( thingToAST( params, body, argumentsPaths[ 1 ].node ) )
+    const callback = 2 === argumentsPaths.length ? argumentsPaths[ 1 ].node : null;
+    argumentsPaths[ 0 ].parentPath.replaceWith( thingToAST( params, body, callback ) )
 }
 
 function thingToAST( params, body, callback ) {
     const paramsCode = params
         .map( param => generate( param ).code )
         .join( ',' );
+
+    let callbackCode;
+    if ( callback === null ) {
+        callbackCode = 'ErrorTrapper.globalFailback';
+    } else {
+        callbackCode = `(${generate( callback ).code})`;
+    }
+
     return babylon.parse( `
     (function() {
         return function( ${paramsCode} ) {
@@ -32,7 +41,7 @@ function thingToAST( params, body, callback ) {
                 } catch(localError) {
                     ErrorTrapper.parseError(localError, function(parsedError) {
                         var context = parsedError.success ? ErrorTrapper.normalizeForStringify(eval(parsedError.code)): {};
-                        (${generate( callback ).code})(e, context, ${SCOPE_CLOSURE_VARIABLE})
+                        ${callbackCode}(e, context, ${SCOPE_CLOSURE_VARIABLE})
                     });
                 }
             }

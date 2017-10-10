@@ -1,6 +1,6 @@
 {
   "name": "error-trapper",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "main": "index.js",
   "repository": "https://github.com/shamcode/error-trapper",
   "license": "MIT",

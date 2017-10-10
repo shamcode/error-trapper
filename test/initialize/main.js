@@ -29,12 +29,15 @@ window.onload = () => {
             const originalParseError = ErrorTrapper.parseError;
             const originNormalizeForStringify = ErrorTrapper.normalizeForStringify;
             const originalPrintContext = ErrorTrapper.printContext;
+            const originalGlobalFailback = ErrorTrapper.globalFailback;
             expect( () => ErrorTrapper.parseError = () => {} ).to.throw();
             expect( () => ErrorTrapper.normalizeForStringify = () => {} ).to.throw();
             expect( () => ErrorTrapper.printContext = () => {} ).to.throw();
+            expect( () => ErrorTrapper.globalFailback = () => {} ).to.throw();
             expect( ErrorTrapper.parseError ).to.be.equal( originalParseError );
             expect( ErrorTrapper.normalizeForStringify ).to.be.equal( originNormalizeForStringify );
             expect( ErrorTrapper.printContext ).to.be.equal( originalPrintContext );
+            expect( ErrorTrapper.globalFailback ).to.be.equal( originalGlobalFailback );
             done();
         } );
     } );
